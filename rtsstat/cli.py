@@ -1,3 +1,4 @@
+import itertools
 import sys
 
 import click
@@ -8,7 +9,7 @@ import seaborn as sns
 import tifffile as tiff
 from rich import print, traceback
 from statannot import add_stat_annotation
-import itertools
+
 
 @click.command()
 @click.option('-m', '--meta', required=True, type=str, help='Path to metadata file')
@@ -37,7 +38,7 @@ def main(meta: str, ratios: str, segs: str, output: str):
     box_pairs = []
     for bl in df["Breeding Line"].unique():
         bps = list(filter(lambda x: x.startswith(bl), df["Breeding Line and Treatment"].unique()))
-        box_pairs = box_pairs + list(itertools.combinations(bps,2))
+        box_pairs = box_pairs + list(itertools.combinations(bps, 2))
     add_stat_annotation(ax, x="Breeding Line and Treatment", y="Ratio", data=df,
                         box_pairs=box_pairs,
                         test='t-test_welch', text_format='star', loc='inside', verbose=2)
