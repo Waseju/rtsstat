@@ -68,12 +68,12 @@ setup(
     package_data={
         module.__name__: walker(
             os.path.dirname(module.__file__),
-            'models', 'data'
+            'data'
         ),
     },
     setup_requires=setup_requirements,
     tests_require=test_requirements,
     url='https://github.com/waseju/rtsstat',
-    version='0.1.0-SNAPSHOT',
+    version='0.1.0',
     zip_safe=False,
 )
