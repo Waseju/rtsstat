@@ -55,7 +55,7 @@ setup(
     description="rtsstat. A mlf-core based .",
     entry_points={
         'console_scripts': [
-            'rtsstat=rtsstat.cli_pytorch:main',
+            'rtsstat=rtsstat.cli:main',
         ],
     },
     install_requires=requirements,
