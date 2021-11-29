@@ -43,14 +43,14 @@ def main(meta: str, ratios: str, segs: str, output: str):
                         box_pairs=box_pairs,
                         test='t-test_welch', text_format='star', loc='inside', verbose=2)
     plt.tight_layout()
-    plt.savefig(f'./boxplot.pdf'.replace(" ", ""), bbox_inches='tight')
+    plt.savefig('./boxplot.pdf'.replace(" ", ""), bbox_inches='tight')
     plt.close()
 
 
 def calc_ratio(ratios, segs, x):
     ratio_img = tiff.imread(ratios + x + "_ratio.tif")
     ratio_img = np.nan_to_num(ratio_img)
-    tif_img = np.load(segs + x + "_brightfield.npy")
+    tif_img = np.load(segs + x + ".npy")
     ratio = extract_ph(ratio_img, tif_img, 2)
     if np.isnan(ratio):
         return np.nan

@@ -14,6 +14,6 @@ full_name: Julian Wanner
 email: jwgithub@mailbox.org
 project_name: rtsstat
 project_short_description: rtsstat. A mlf-core based .
-version: 0.1.1
+version: 0.1.2
 license: MIT
 framework: pytorch
