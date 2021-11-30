@@ -1,4 +1,5 @@
 import itertools
+import os
 import sys
 
 import click
@@ -8,14 +9,14 @@ import pandas as pd
 import seaborn as sns
 import tifffile as tiff
 from rich import print, traceback
-from statannot import add_stat_annotation
+from statannotations.Annotator import Annotator
 
 
 @click.command()
 @click.option('-m', '--meta', required=True, type=str, help='Path to metadata file')
 @click.option('-r', '--ratios', required=True, type=str, help='Path to metadata file')
 @click.option('-s', '--segs', required=True, type=str, help='Path to metadata file')
-@click.option('-o', '--output', type=str, help='Path to write the output to')
+@click.option('-o', '--output', default="./", type=str, help='Path to write the output to')
 def main(meta: str, ratios: str, segs: str, output: str):
     """Command-line interface for rtsstat"""
 
@@ -26,24 +27,27 @@ def main(meta: str, ratios: str, segs: str, output: str):
     print('[bold blue]Run [green]rtsstat --help [blue]for an overview of all commands\n')
     df = pd.read_csv(meta, header=0)
     df = df
+    sns.set(style="darkgrid", font_scale=1.5, palette="colorblind",
+            rc={"lines.linewidth": 2, 'grid.linestyle': '--'})
+    plt.rcParams["figure.figsize"] = (10 * 1.62, 10)  # (w, h)
     ratios = [calc_ratio(ratios, segs, x) for x in df['Filename']]
     df["Ratio"] = ratios
     df["Breeding Line and Treatment"] = df["Breeding Line"] + " " + df["Treatment"]
     plt.figure()
-    ax = sns.boxplot(x="Breeding Line and Treatment", y="Ratio",
-                     data=df[df["Ratio"] != 0], showmeans=True)
+    ax = sns.boxplot(x="Breeding Line", y="Ratio", hue="Treatment",
+                     data=df[df["Ratio"] != 0], showmeans=True, meanprops={"marker": "+",
+                                                                           "markeredgecolor": "black",
+                                                                           "markersize": "10"})
     df = df.dropna()
-    print(df.groupby(['Treatment', 'Breeding Line']).mean())
-    print(df.groupby(['Treatment', 'Breeding Line']).std())
-    box_pairs = []
-    for bl in df["Breeding Line"].unique():
-        bps = list(filter(lambda x: x.startswith(bl), df["Breeding Line and Treatment"].unique()))
-        box_pairs = box_pairs + list(itertools.combinations(bps, 2))
-    add_stat_annotation(ax, x="Breeding Line and Treatment", y="Ratio", data=df,
-                        box_pairs=box_pairs,
-                        test='t-test_welch', text_format='star', loc='inside', verbose=2)
+    product = set(itertools.product(df['Breeding Line'], df['Treatment']))
+    box_pairs = ([(a, b) for a, b in itertools.combinations(product, 2) if a[0] == b[0]])
+    annotator = Annotator(ax, box_pairs, data=df, x="Breeding Line", y="Ratio", hue="Treatment")
+    annotator.configure(test='t-test_welch', show_test_name=False, text_format='simple', loc='inside')
+    annotator.apply_and_annotate()
     plt.tight_layout()
-    plt.savefig('./boxplot.pdf'.replace(" ", ""), bbox_inches='tight')
+    output = output.replace(" ", "_")
+    os.makedirs(output, exist_ok=True)
+    plt.savefig(f'{output}/boxplot.pdf', bbox_inches='tight')
     plt.close()
 
 
