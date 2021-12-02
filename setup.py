@@ -74,6 +74,6 @@ setup(
     setup_requires=setup_requirements,
     tests_require=test_requirements,
     url='https://github.com/waseju/rtsstat',
-    version='0.1.2',
+    version='0.1.4',
     zip_safe=False,
 )
