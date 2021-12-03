@@ -64,7 +64,7 @@ def calc_ratio(ratios, segs, x):
     tif_img = np.load(segs + x + ".npy")
     ratio_ee = extract_ph(ratio_img, tif_img, 2)
     ratio_m = extract_ph(ratio_img, tif_img, 4)
-    if ratio_m > ratio_ee:
+    if ratio_m > 1.25*ratio_ee:
         ratio = ratio_m
         zone = "Meristematic Zone"
     else:
@@ -79,7 +79,7 @@ def calc_ratio(ratios, segs, x):
 def extract_ph(ratio_img, tif_img, class_index):
     late_array = ratio_img[tif_img == class_index]
     # Empirically determined value to exclude too small predictions.
-    if late_array.shape[0] < 100:
+    if late_array.shape[0] < 1000:
         return 0
     return np.true_divide(late_array.sum(0), (late_array != 0).sum(0))
 
